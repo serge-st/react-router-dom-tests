@@ -1,15 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, useLoaderData } from "react-router-dom";
-import { Outlet } from "react-router-dom";
-import { getContacts } from "../contacts.js";
+import { Link, useLoaderData, Outlet, LoaderFunction, Form } from "react-router-dom";
+import { getContacts, createContact } from "../contacts.js";
+
+export type LoaderData<TLoaderFn extends LoaderFunction> = Awaited<ReturnType<TLoaderFn>> extends Response | infer D
+	? D
+	: never;
 
 export async function loader() {
   const contacts = await getContacts();
   return { contacts };
 }
 
+export async function action() {
+  const contact = await createContact();
+  return { contact };
+}
+
 export default function Root() {
-  const { contacts } = useLoaderData();
+  const { contacts } = useLoaderData() as LoaderData<typeof loader>;
     return (
       <>
         <div id="sidebar">
@@ -33,9 +41,9 @@ export default function Root() {
                 aria-live="polite"
               ></div>
             </form>
-            <form method="post">
+            <Form method="post">
               <button type="submit">New</button>
-            </form>
+            </Form>
           </div>
           <nav>
             {contacts.length ? (

@@ -1,5 +1,7 @@
 import { FC } from 'react';
-import { Form } from "react-router-dom";
+import { Form, LoaderFunction, useLoaderData } from "react-router-dom";
+import { getContact } from "../contacts.js";
+import { LoaderData } from './Root.js';
 
 interface Contact {
     first: string;
@@ -10,15 +12,21 @@ interface Contact {
     favorite: boolean;
 }
 
+export const loader: LoaderFunction = async ({params}): Promise<{ contact: Contact }> => {
+  const contact = await getContact(params.contactId) as Contact;
+  return { contact };
+}
+
 export default function Contact() {
-  const contact: Contact = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://placekitten.com/g/200/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  const { contact } = useLoaderData() as LoaderData<typeof loader>;
+  // const contact: Contact = {
+  //   first: "Your",
+  //   last: "Name",
+  //   avatar: "https://placekitten.com/g/200/200",
+  //   twitter: "your_handle",
+  //   notes: "Some notes",
+  //   favorite: true,
+  // };
 
   return (
     <div id="contact">

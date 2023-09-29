@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, useLoaderData, Outlet, LoaderFunction, Form } from "react-router-dom";
+import { Link, useLoaderData, Outlet, LoaderFunction, Form, redirect } from "react-router-dom";
 import { getContacts, createContact } from "../contacts.js";
 
 export type LoaderData<TLoaderFn extends LoaderFunction> = Awaited<ReturnType<TLoaderFn>> extends Response | infer D
@@ -13,7 +13,7 @@ export async function loader() {
 
 export async function action() {
   const contact = await createContact();
-  return { contact };
+  return redirect(`/contacts/${contact.id}/edit`)
 }
 
 export default function Root() {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, useLoaderData, Outlet, LoaderFunction, Form, redirect, NavLink } from "react-router-dom";
+import { useNavigation, useLoaderData, Outlet, LoaderFunction, Form, redirect, NavLink } from "react-router-dom";
 import { getContacts, createContact } from "../contacts.js";
 
 export type LoaderData<TLoaderFn extends LoaderFunction> = Awaited<ReturnType<TLoaderFn>> extends Response | infer D
@@ -18,6 +18,8 @@ export async function action() {
 
 export default function Root() {
   const { contacts } = useLoaderData() as LoaderData<typeof loader>;
+  const navigation = useNavigation();
+
     return (
       <>
         <div id="sidebar">
@@ -79,7 +81,12 @@ export default function Root() {
             )}
           </nav>
         </div>
-        <div id="detail">
+        <div 
+          id="detail"
+          className={
+            navigation.state === "loading" ? "loading" : ""
+          }
+        >
           <Outlet />
         </div>
       </>

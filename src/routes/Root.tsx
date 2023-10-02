@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useNavigation, useLoaderData, Outlet, LoaderFunction, Form, redirect, NavLink } from "react-router-dom";
+import { useNavigation, useLoaderData, Outlet, LoaderFunction, Form, redirect, NavLink, useSubmit } from "react-router-dom";
 import { getContacts, createContact } from "../contacts.js";
 import { useEffect, useState } from "react";
 
@@ -24,6 +24,13 @@ export default function Root() {
   const { contacts, q } = useLoaderData() as LoaderData<typeof loader>;
   const [query, setQuery] = useState(q);
   const navigation = useNavigation();
+  const submit = useSubmit();
+
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      "q"
+    );
 
   useEffect(() => {
     setQuery(q);
@@ -37,6 +44,7 @@ export default function Root() {
             <Form id="search-form" role="search">
               <input
                 id="q"
+                className={searching ? "loading" : ""}
                 aria-label="Search contacts"
                 placeholder="Search"
                 type="search"
@@ -44,12 +52,13 @@ export default function Root() {
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
+                  submit(e.currentTarget.form);
                 }}
               />
               <div
                 id="search-spinner"
                 aria-hidden
-                hidden={true}
+                hidden={!searching}
               />
               <div
                 className="sr-only"

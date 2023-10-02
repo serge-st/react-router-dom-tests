@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { Form, LoaderFunction, useLoaderData } from "react-router-dom";
-import { getContact } from "../contacts.js";
+import { Form, LoaderFunction, useFetcher, useLoaderData } from "react-router-dom";
+import { getContact, updateContact } from "../contacts.js";
 import { LoaderData } from './Root.js';
 
 interface Contact {
@@ -10,6 +10,13 @@ interface Contact {
     twitter: string;
     notes: string;
     favorite: boolean;
+}
+
+export async function action({ request, params }) {
+  let formData = await request.formData();
+  return updateContact(params.contactId, {
+    favorite: formData.get("favorite") === "true",
+  });
 }
 
 export const loader: LoaderFunction = async ({params}): Promise<{ contact: Contact }> => {
@@ -92,11 +99,12 @@ interface FavoriteProps {
 }
 
 const Favorite: FC<FavoriteProps> = ({ contact }) => {
+  const fetcher = useFetcher();
   // yes, this is a `let` for later
   // eslint-disable-next-line prefer-const
   let favorite = contact.favorite;
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -108,6 +116,7 @@ const Favorite: FC<FavoriteProps> = ({ contact }) => {
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
+
   );
 }

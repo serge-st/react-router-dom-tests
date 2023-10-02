@@ -20,7 +20,13 @@ export async function action({ request, params }) {
 }
 
 export const loader: LoaderFunction = async ({params}): Promise<{ contact: Contact }> => {
-  const contact = await getContact(params.contactId) as Contact;
+  const contact = await getContact(params.contactId);
+  if (!contact) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
   return { contact };
 }
 
@@ -103,6 +109,9 @@ const Favorite: FC<FavoriteProps> = ({ contact }) => {
   // yes, this is a `let` for later
   // eslint-disable-next-line prefer-const
   let favorite = contact.favorite;
+  if (fetcher.formData) {
+    favorite = fetcher.formData.get("favorite") === "true";
+  }
   return (
     <fetcher.Form method="post">
       <button
